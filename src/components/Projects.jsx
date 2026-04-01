@@ -1,80 +1,130 @@
-import { motion } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import { useState } from "react";
 
 const projects = [
   {
-    title: "Flipkart Automation",
-    description:
-      "End-to-end automation using Cypress with Page Object Model covering search, cart, and checkout flows.",
-    tech: ["Cypress", "JavaScript", "POM"],
+    title: "Flipkart E2E Automation",
+    description: "Architected a robust automation suite using Cypress and POM, achieving 95% test coverage for mission-critical search-to-checkout flows.",
+    tech: ["Cypress", "JavaScript", "POM", "GitHub Actions"],
     github: "https://github.com/your-username/flipkart-automation",
+    category: "Automation"
   },
   {
-    title: "BStack Demo Testing",
-    description:
-      "Automated UI testing for login and product workflows using Cypress.",
-    tech: ["Cypress", "UI Testing"],
+    title: "BStack Cloud Testing",
+    description: "High-concurrency UI testing executed on BrowserStack cloud. Optimized execution time by 40% through parallelization.",
+    tech: ["Cypress", "Cloud Testing", "Parallelization"],
     github: "https://github.com/your-username/bstack-demo",
+    category: "Infrastructure"
   },
   {
-    title: "Manual Testing Project",
-    description:
-      "Created test cases, executed testing, and reported bugs with proper documentation.",
-    tech: ["Test Cases", "Bug Reports", "JIRA"],
+    title: "Strategic QA Framework",
+    description: "Full-lifecycle manual testing strategy, featuring comprehensive bug-tracking workflows and stakeholder-ready documentation.",
+    tech: ["JIRA", "STLC", "TestRail", "Agile"],
     github: "https://github.com/your-username/manual-testing",
+    category: "Strategy"
   },
 ];
 
-function Projects() {
+// Reusable Project Card with "Spotlight" Effect
+function ProjectCard({ project, index }) {
+  let mouseX = useMotionValue(0);
+  let mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }) {
+    let { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
   return (
-    <section className="bg-black text-white py-24 px-8 md:px-20">
-      <motion.h2
-        className="text-4xl font-bold text-center mb-12"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        Projects
-      </motion.h2>
+    <motion.div
+      onMouseMove={handleMouseMove}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: index * 0.1 }}
+      className="group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-8 transition-shadow hover:shadow-2xl hover:shadow-blue-500/10"
+    >
+      {/* THE MOUSE GLOW EFFECT */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover:opacity-100"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              650px circle at ${mouseX}px ${mouseY}px,
+              rgba(59, 130, 246, 0.15),
+              transparent 80%
+            )
+          `,
+        }}
+      />
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {projects.map((project, index) => (
-          <motion.div
-            key={index}
-            className="bg-gray-900 p-6 rounded-xl shadow-lg"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
-            whileHover={{ scale: 1.05 }}
->
-            <h3 className="text-2xl font-semibold mb-3">
-            {project.title}
-            </h3>
-
-            <p className="text-gray-400 mb-4">
-            {project.description}
-            </p>
-
-            {/* Tech Stack */}
-    <div className="flex flex-wrap gap-2 mb-4">
-            {project.tech.map((tech, i) => (
-        <span
-        key={i}
-        className="bg-gray-700 px-3 py-1 rounded-full text-sm"
-      >
-        {tech}
-        </span>
-    ))}
-    </div>
-    {/* GitHub Link */}
-        <a
+      <div className="relative flex flex-col h-full">
+        <div className="flex justify-between items-start mb-6">
+          <span className="text-xs font-bold uppercase tracking-widest text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full">
+            {project.category}
+          </span>
+          <motion.a
+            whileHover={{ scale: 1.2, rotate: 15 }}
             href={project.github}
             target="_blank"
-            className="text-blue-400 hover:underline"
-  >
-            View Project →
+            className="text-gray-400 hover:text-white"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </motion.a>
+        </div>
+
+        <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+          {project.title}
+        </h3>
+
+        <p className="text-gray-400 mb-6 flex-grow leading-relaxed">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          {project.tech.map((tech, i) => (
+            <span key={i} className="text-[10px] font-medium px-2 py-1 rounded bg-white/5 border border-white/10 text-gray-300">
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <a
+          href={project.github}
+          target="_blank"
+          className="inline-flex items-center text-sm font-semibold text-blue-400 group/link"
+        >
+          Case Study 
+          <span className="ml-1 transition-transform group-hover/link:translate-x-1">→</span>
         </a>
-            </motion.div>
-        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function Projects() {
+  return (
+    <section id="projects" className="bg-[#030303] text-white py-32 px-6 md:px-20 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+      
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col items-center mb-20 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent"
+          >
+            Featured Frameworks
+          </motion.h2>
+          <div className="h-1 w-20 bg-blue-600 rounded-full"></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project, index) => (
+            <ProjectCard key={index} project={project} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );
